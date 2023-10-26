@@ -34,8 +34,8 @@ jobs:
 
       - name: Zip Lambda
         run: |
-          chmod +x .gen_zip.sh
-          .gen_zip.sh
+          chmod +x ./gen_zip.sh
+          ./gen_zip.sh
 
       - name: Terraform Init
         id: init
