@@ -11,8 +11,8 @@ on:
           - Terraform_apply
           - Terraform_destroy
 permissions:
-  id-token: write   # This is required for requesting the JWT
-  contents: read    # This is required for actions/checkout
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 jobs:
   terraform_apply:
     name: "Terraform_apply"
@@ -50,7 +50,7 @@ jobs:
       - name: Terraform Apply
         id: apply
         working-directory: ./terraform
-        run: terraform apply -auto-approve 
+        run: terraform apply -auto-approve
 
   terraform_destroy:
     name: "Terraform_destroy"
@@ -72,9 +72,10 @@ jobs:
 
       - name: Terraform Init
         id: init
+        working-directory: ./terraform
         run: terraform init
 
       - name: Terraform Destroy
         id: destroy
-        working-directory: .
-        run: terraform destroy -auto-approve 
+        working-directory: ./terraform
+        run: terraform destroy -auto-approve
