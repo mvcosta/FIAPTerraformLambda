@@ -11,4 +11,4 @@ rm -rf psycopg-download &&
 cd python &&
 mv psycopg2-3.8/ psycopg2 &&
 pip install PyJWT -t . &&
-zip ../hello.zip * 
+zip ../auth.zip * 
