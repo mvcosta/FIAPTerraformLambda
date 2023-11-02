@@ -2,21 +2,14 @@ name: "Terraform"
 
 on:
   workflow_dispatch:
-    inputs:
-      # Terraform action you want to perform
-      action:
-        description: "Terraform Action to Perform"
-        type: choice
-        options:
-          - Terraform_apply
-          - Terraform_destroy
+  push:
+    branches: [ main ]
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
 jobs:
   terraform_apply:
     name: "Terraform_apply"
-    if: ${{ github.event.inputs.action == 'Terraform_apply' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -51,31 +44,3 @@ jobs:
         id: apply
         working-directory: ./terraform
         run: terraform apply -auto-approve
-
-  terraform_destroy:
-    name: "Terraform_destroy"
-    if: ${{ github.event.inputs.action == 'Terraform_destroy' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4 # More information on this action can be found below in the 'AWS Credentials' section
-        with:
-          role-to-assume: arn:aws:iam::807550779778:role/GHActions
-          aws-region: us-east-1
-
-      - name: Terraform Init
-        id: init
-        working-directory: ./terraform
-        run: terraform init
-
-      - name: Terraform Destroy
-        id: destroy
-        working-directory: ./terraform
-        run: terraform destroy -auto-approve
