@@ -20,7 +20,7 @@ get_secret_value_response = client.get_secret_value(SecretId=secret_name)
 
 # Decrypts secret using the associated KMS key.
 credential = json.loads(get_secret_value_response["SecretString"])
-credential["db"] = "fiap"
+credential["db"] = "fiapPedido"
 
 connection = psycopg2.connect(
     user=credential["username"],
@@ -72,17 +72,27 @@ def lambda_handler(event, context):
 
     cursor = connection.cursor()
 
-    query = "SELECT * FROM cliente WHERE cpf = %s"
+    try:
+        query = "SELECT * FROM cliente WHERE cpf = %s"
+        cursor.execute(query, (cpf,))
+        results = cursor.fetchone()
+        if not results:
+            token = generate_jwt_token(cpf=cpf)
+            return generate_response(token)
 
-    cursor.execute(query, (cpf,))
-    results = cursor.fetchone()
-    cursor.close()
-    connection.commit()
-
-    if not results:
-        token = generate_jwt_token(cpf=cpf)
+        token = generate_jwt_token(results[0], results[1], cpf)
         return generate_response(token)
 
-    token = generate_jwt_token(results[0], results[1], cpf)
-    return generate_response(token)
+    except Exception as e:
+        print(f"Exception: {str(e)}")
+        connection.rollback()
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({"error": "Internal Server Error"})
+        }
+
+    finally:
+        cursor.close()
+        connection.commit()
 
